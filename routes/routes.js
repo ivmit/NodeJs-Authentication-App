@@ -10,23 +10,37 @@ module.exports = function(app, passport) {
     });
 
     app.get('/login', function(req, res){
-       res.render('login.ejs', {message: req.flash('signupMessage')}); //flash any data if exists
+       res.render('login.ejs', {message: req.flash('loginMessage')}); //flash any data if exists
     });
 
     app.get('/profile', isLoggedIn, function (req, res) {
-        res.render('profile,js', {
+        res.render('profile.ejs', {
             user : req.user     //get the user from the current session and pass to template
         });
     });
 
     app.get('/logout', function(req, res) {
         req.logout();
-        res.redirect();
+        res.redirect('/');
     });
 
+    app.get('/signup', function(req, res) {
+        res.render('signup.ejs', {message: req.flash('signupMessage')});
+    });
 
     //process signup form
-    //app.post('/signup', do passport stuff)
+    app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect : '/profile',
+        failureRedirect : '/signup',
+        failureFlash : true //allow flash message
+    }));
+
+    //process login form
+    app.post('/login', passport.authenticate('local-login', {
+        successRedirect : '/profile',
+        failureRedirect : '/login',
+        failureFlash : true //allow flash message
+    }));
 
 
 };
